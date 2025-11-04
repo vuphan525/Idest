@@ -92,7 +92,7 @@ export default function ClassesPage() {
               </div>
             </div>
 
-            {/* Add Class, Join Class Button */}
+            {/* Nhóm 2 nút lại chung */}
             <div className="flex items-center gap-3">
               {(userRole === "TEACHER" || userRole === "ADMIN") && (
                 <Button
@@ -244,11 +244,9 @@ export default function ClassesPage() {
                   Start your English learning journey by creating or joining a class!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  {(userRole === "TEACHER" || userRole === "ADMIN") &&
-                    (<button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                      Create a Class
-                    </button>
-                    )}
+                  <button className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                    Create a Class
+                  </button>
                   <button
                     onClick={() => setShowJoinModal(true)}
                     className="px-6 py-3 bg-white border-2 border-indigo-600 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-all"
