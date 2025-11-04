@@ -62,7 +62,7 @@ export function ForgotPasswordForm({
           </div>
           <div className="flex flex-col">
             <span className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Idest
+              EnglishMaster
             </span>
             <span className="text-sm text-gray-500 font-medium">
               Learn • Practice • Excel
@@ -102,7 +102,7 @@ export function ForgotPasswordForm({
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-start gap-2">
                     <span className="text-indigo-600 font-bold">1.</span>
-                    <span>Mở email từ Idest</span>
+                    <span>Mở email từ EnglishMaster</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-indigo-600 font-bold">2.</span>
