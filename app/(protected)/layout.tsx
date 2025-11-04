@@ -8,7 +8,6 @@ const navItems = [
   { href: "/classes", label: "Classes" },
   { href: "/sessions", label: "Sessions" },
   { href: "/assignment", label: "Assignments" },
-  { href: "/service-status", label: "Service Status" },
 ];
 
 const aiSubItems = [
