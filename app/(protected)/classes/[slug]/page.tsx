@@ -6,7 +6,6 @@ import Image from "next/image";
 import { getClassBySlug } from "@/services/class.service";
 import {
   getClassSessions,
-  getAllSessions,
   endSession,
   deleteSession,
 } from "@/services/session.service";
@@ -65,49 +64,23 @@ export default function ClassDetailPage() {
     const loadSessions = async () => {
       if (!classData?.id) return;
       try {
-        let sessions: SessionData[] = [];
-        
-        // For teachers and admins, use getAllSessions() and filter by class
-        // For students, use getClassSessions() to get class-specific sessions
-        if (userRole === "TEACHER" || userRole === "ADMIN") {
-          const res = await getAllSessions();
-          const allSessions = Array.isArray(res.data) ? res.data : [];
-          // Filter sessions for this class
-          sessions = allSessions.filter((s: SessionData) => s.class_id === classData.id);
-        } else {
-          const res = await getClassSessions(classData.id);
-          sessions = Array.isArray(res.data) ? res.data : [];
-        }
-        
-        setClassSessions(sessions);
+        const res = await getClassSessions(classData.id);
+        setClassSessions(res.data || []);
       } catch (err) {
         console.error("Error fetching sessions:", err);
       }
     };
 
-    if (classData?.id && userRole !== null) {
+    if (classData?.id) {
       loadSessions();
     }
-  }, [classData?.id, userRole]);
+  }, [classData?.id]);
 
   const refreshSessions = async () => {
     if (!classData?.id) return;
     try {
-      let sessions: SessionData[] = [];
-      
-      // For teachers and admins, use getAllSessions() and filter by class
-      // For students, use getClassSessions() to get class-specific sessions
-      if (userRole === "TEACHER" || userRole === "ADMIN") {
-        const res = await getAllSessions();
-        const allSessions = Array.isArray(res.data) ? res.data : [];
-        // Filter sessions for this class
-        sessions = allSessions.filter((s: SessionData) => s.class_id === classData.id);
-      } else {
-        const res = await getClassSessions(classData.id);
-        sessions = Array.isArray(res.data) ? res.data : [];
-      }
-      
-      setClassSessions(sessions);
+      const res = await getClassSessions(classData.id);
+      setClassSessions(res.data || []);
     } catch (err) {
       console.error("Error fetching sessions:", err);
     }
