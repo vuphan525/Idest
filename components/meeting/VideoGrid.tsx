@@ -7,25 +7,21 @@ import { Participant } from "@/types/meet";
 interface VideoGridProps {
   localParticipant: Participant | null;
   localStream: MediaStream | null;
-  localScreenShareStream: MediaStream | null;
   isLocalAudioEnabled: boolean;
   isLocalVideoEnabled: boolean;
   isLocalScreenSharing: boolean;
   participants: Participant[];
   remoteStreams: Map<string, MediaStream>;
-  remoteScreenShareStreams: Map<string, MediaStream>;
 }
 
 export default function VideoGrid({
   localParticipant,
   localStream,
-  localScreenShareStream,
   isLocalAudioEnabled,
   isLocalVideoEnabled,
   isLocalScreenSharing,
   participants,
   remoteStreams,
-  remoteScreenShareStreams,
 }: VideoGridProps) {
   // Calculate grid layout based on number of participants (including local)
   const totalParticipants = participants.length + (localParticipant ? 1 : 0);
@@ -54,43 +50,28 @@ export default function VideoGrid({
       isLocal: boolean;
       isAudioEnabled: boolean;
       isVideoEnabled: boolean;
-      isScreenSharing: boolean;
     }> = [];
 
     // Add local participant first
     if (localParticipant && localStream) {
       list.push({
         participant: localParticipant,
-        stream: isLocalScreenSharing && localScreenShareStream ? localScreenShareStream : localStream,
+        stream: localStream,
         isLocal: true,
         isAudioEnabled: isLocalAudioEnabled,
         isVideoEnabled: isLocalVideoEnabled,
-        isScreenSharing: isLocalScreenSharing,
       });
     }
 
-    // Add remote participants - only include if they have a stream or are actively in the meeting
+    // Add remote participants
     participants.forEach((participant) => {
-      const hasStream = remoteStreams.has(participant.userId);
-      const hasScreenShare = remoteScreenShareStreams.has(participant.userId);
-      const isScreenSharing = participant.isScreenSharing ?? false;
-      
-      // Only add participants who have active streams or are marked as online
-      if (hasStream || hasScreenShare || participant.isOnline) {
-        // Use screen share stream if available and participant is screen sharing, otherwise use regular stream
-        const stream = isScreenSharing && hasScreenShare
-          ? remoteScreenShareStreams.get(participant.userId) || null
-          : remoteStreams.get(participant.userId) || null;
-        
-        list.push({
-          participant,
-          stream,
-          isLocal: false,
-          isAudioEnabled: participant.isAudioEnabled ?? true,
-          isVideoEnabled: participant.isVideoEnabled ?? true,
-          isScreenSharing,
-        });
-      }
+      list.push({
+        participant,
+        stream: remoteStreams.get(participant.userId) || null,
+        isLocal: false,
+        isAudioEnabled: true, // TODO: Get from participant state if available
+        isVideoEnabled: true, // TODO: Get from participant state if available
+      });
     });
 
     return list;
@@ -99,11 +80,8 @@ export default function VideoGrid({
     localStream,
     isLocalAudioEnabled,
     isLocalVideoEnabled,
-    isLocalScreenSharing,
     participants,
     remoteStreams,
-    localScreenShareStream,
-    remoteScreenShareStreams,
   ]);
 
   if (totalParticipants === 0) {
@@ -115,41 +93,37 @@ export default function VideoGrid({
   }
 
   // Screen sharing layout: show shared screen large, participants small sidebar
-  // Check for screen sharing from any participant
-  const sharingParticipant = allParticipants.find(p => p.isScreenSharing);
-  
-  if (sharingParticipant) {
+  if (isLocalScreenSharing && allParticipants.length > 0) {
+    const sharingParticipant = allParticipants[0]; // Local participant is sharing
+    const otherParticipants = allParticipants.slice(1);
+
     return (
-      <div className="flex flex-col gap-4 h-full overflow-hidden">
+      <div className="flex h-full gap-4">
         {/* Main screen share */}
-        <div className="bg-gray-900 rounded-lg overflow-hidden flex-1 min-h-0 max-h-[70vh] flex items-center justify-center">
+        <div className="flex-1 bg-gray-900 rounded-lg overflow-hidden">
           <VideoTile
-            key={`${sharingParticipant.participant.userId}-screen`}
+            key={sharingParticipant.participant.userId}
             participant={sharingParticipant.participant}
             stream={sharingParticipant.stream}
             isLocal={sharingParticipant.isLocal}
             isAudioEnabled={sharingParticipant.isAudioEnabled}
-            isVideoEnabled={true}
-            isScreenSharing={true}
-            className="w-full h-full max-w-full max-h-full"
+            isVideoEnabled={sharingParticipant.isVideoEnabled}
+            className="w-full h-full"
           />
         </div>
 
-        {/* Bottom bar with all participants (including the one sharing) */}
-        {allParticipants.length > 1 && (
-          <div className="w-full flex gap-2 overflow-x-auto pb-2 pt-2 flex-shrink-0">
-            {allParticipants.map(({ participant, stream, isLocal, isAudioEnabled, isVideoEnabled }) => (
-              <div className="min-w-[160px] max-w-[200px] flex-shrink-0" key={participant.userId}>
-                <VideoTile
-                  participant={participant}
-                  stream={stream}
-                  isLocal={isLocal}
-                  isAudioEnabled={isAudioEnabled}
-                  isVideoEnabled={isVideoEnabled}
-                  isScreenSharing={false}
-                  className="h-28 w-full"
-                />
-              </div>
+        {/* Sidebar with other participants */}
+        {otherParticipants.length > 0 && (
+          <div className="w-64 flex flex-col gap-2 overflow-y-auto">
+            {otherParticipants.map(({ participant, stream, isLocal, isAudioEnabled, isVideoEnabled }) => (
+              <VideoTile
+                key={participant.userId}
+                participant={participant}
+                stream={stream}
+                isLocal={isLocal}
+                isAudioEnabled={isAudioEnabled}
+                isVideoEnabled={isVideoEnabled}
+              />
             ))}
           </div>
         )}
@@ -160,7 +134,7 @@ export default function VideoGrid({
   // Regular grid layout
   return (
     <div className={`grid ${gridClass} gap-4 h-full`}>
-      {allParticipants.map(({ participant, stream, isLocal, isAudioEnabled, isVideoEnabled, isScreenSharing }) => (
+      {allParticipants.map(({ participant, stream, isLocal, isAudioEnabled, isVideoEnabled }) => (
         <VideoTile
           key={participant.userId}
           participant={participant}
@@ -168,7 +142,6 @@ export default function VideoGrid({
           isLocal={isLocal}
           isAudioEnabled={isAudioEnabled}
           isVideoEnabled={isVideoEnabled}
-          isScreenSharing={isScreenSharing}
         />
       ))}
     </div>

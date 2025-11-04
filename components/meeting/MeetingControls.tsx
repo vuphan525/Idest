@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, MicOff, Video, VideoOff, Monitor, LogOut, MessageCircle, Users } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Monitor, LogOut, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MeetingControlsProps {
@@ -8,9 +8,7 @@ interface MeetingControlsProps {
   isVideoEnabled: boolean;
   isScreenSharing: boolean;
   showChat: boolean;
-  showParticipants: boolean;
   onToggleChat: () => void;
-  onToggleParticipants: () => void;
   newMessageCount: number;
   onToggleAudio: () => void;
   onToggleVideo: () => void;
@@ -23,9 +21,7 @@ export default function MeetingControls({
   isVideoEnabled,
   isScreenSharing,
   showChat,
-  showParticipants,
   onToggleChat,
-  onToggleParticipants,
   newMessageCount,
   onToggleAudio,
   onToggleVideo,
@@ -87,16 +83,6 @@ export default function MeetingControls({
             {newMessageCount > 9 ? "9+" : newMessageCount}
           </span>
         )}
-      </Button>
-
-      <Button
-        onClick={onToggleParticipants}
-        variant={showParticipants ? "default" : "outline"}
-        size="lg"
-        className="rounded-full w-14 h-14 p-0"
-        title={showParticipants ? "Hide participants" : "Show participants"}
-      >
-        <Users className="w-6 h-6" />
       </Button>
 
       <div className="w-px h-12 bg-gray-300" />

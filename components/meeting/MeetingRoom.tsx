@@ -15,17 +15,15 @@ interface MeetingRoomProps {
 }
 
 export default function MeetingRoom({ sessionId, token }: MeetingRoomProps) {
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [showParticipants, setShowParticipants] = useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [lastMessageCount, setLastMessageCount] = useState(0);
-  const [isMediaInitializing, setIsMediaInitializing] = useState(true);
   const {
     isConnected,
     isJoining,
     error,
     localStream,
-    localScreenShareStream,
     isAudioEnabled,
     isVideoEnabled,
     isScreenSharing,
@@ -34,7 +32,6 @@ export default function MeetingRoom({ sessionId, token }: MeetingRoomProps) {
     messages,
     messageHistory,
     remoteStreams,
-    remoteScreenShareStreams,
     joinRoom,
     leaveRoom,
     sendMessage,
@@ -66,13 +63,6 @@ export default function MeetingRoom({ sessionId, token }: MeetingRoomProps) {
     }
   }, [isConnected, sessionId, loadMessageHistory]);
 
-  // Track media initialization
-  useEffect(() => {
-    if (localStream) {
-      setIsMediaInitializing(false);
-    }
-  }, [localStream]);
-
   // Track unread messages when chat is hidden
   useEffect(() => {
     const currentMessageCount = messages.length + messageHistory.length;
@@ -99,14 +89,12 @@ export default function MeetingRoom({ sessionId, token }: MeetingRoomProps) {
     window.location.href = "/sessions";
   };
 
-  if (isJoining || isMediaInitializing) {
+  if (isJoining) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <LoadingScreen />
-          <p className="mt-4 text-gray-600">
-            {isJoining ? "Joining meeting..." : "Initializing camera and microphone..."}
-          </p>
+          <p className="mt-4 text-gray-600">Joining meeting...</p>
         </div>
       </div>
     );
@@ -150,39 +138,27 @@ export default function MeetingRoom({ sessionId, token }: MeetingRoomProps) {
             <VideoGrid
               localParticipant={localParticipant}
               localStream={localStream}
-              localScreenShareStream={localScreenShareStream}
               isLocalAudioEnabled={isAudioEnabled}
               isLocalVideoEnabled={isVideoEnabled}
               isLocalScreenSharing={isScreenSharing}
               participants={participants}
               remoteStreams={remoteStreams}
-              remoteScreenShareStreams={remoteScreenShareStreams}
             />
           </div>
 
           {/* Controls */}
-          <div className="flex-shrink-0">
           <MeetingControls
             isAudioEnabled={isAudioEnabled}
             isVideoEnabled={isVideoEnabled}
             isScreenSharing={isScreenSharing}
             showChat={showChat}
-            showParticipants={showParticipants}
-            onToggleChat={() => {
-              setShowChat(!showChat);
-              setShowParticipants(false);
-            }}
-            onToggleParticipants={() => {
-              setShowParticipants(!showParticipants);
-              setShowChat(false);
-            }}
+            onToggleChat={() => setShowChat(!showChat)}
             newMessageCount={unreadMessageCount}
             onToggleAudio={toggleAudio}
             onToggleVideo={toggleVideo}
             onToggleScreenShare={toggleScreenShare}
             onLeave={handleLeave}
           />
-          </div>
         </div>
 
         {/* Sidebar - Chat and Participants */}

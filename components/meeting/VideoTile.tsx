@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Mic, MicOff, Video, VideoOff, Monitor, Circle } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff } from "lucide-react";
 import DefaultAvatar from "@/assets/default-avatar.png";
 import { Participant } from "@/types/meet";
 
@@ -12,8 +12,6 @@ interface VideoTileProps {
   isLocal?: boolean;
   isAudioEnabled?: boolean;
   isVideoEnabled?: boolean;
-  isScreenSharing?: boolean;
-  isRecording?: boolean;
   className?: string;
 }
 
@@ -23,8 +21,6 @@ export default function VideoTile({
   isLocal = false,
   isAudioEnabled = true,
   isVideoEnabled = true,
-  isScreenSharing = false,
-  isRecording = false,
   className = "",
 }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -40,7 +36,7 @@ export default function VideoTile({
 
   return (
     <div
-      className={`relative bg-gray-900 rounded-lg overflow-hidden ${isScreenSharing ? '' : 'aspect-video'} ${className}`}
+      className={`relative bg-gray-900 rounded-lg overflow-hidden aspect-video ${className}`}
     >
       {stream && isVideoEnabled ? (
         <video
@@ -48,7 +44,7 @@ export default function VideoTile({
           autoPlay
           playsInline
           muted={isLocal}
-          className={`w-full h-full ${isScreenSharing ? 'object-contain max-w-full max-h-full' : 'object-cover scale-x-[-1]'}`}
+          className={`w-full h-full object-cover ${isLocal ? 'scale-x-[-1]' : ''}`}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-800">
@@ -96,30 +92,11 @@ export default function VideoTile({
         </div>
       </div>
 
-      {/* Connection and recording indicators */}
-      <div className="absolute top-2 right-2 flex items-center gap-2">
-        {/* Recording indicator */}
-        {isRecording && (
-          <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded-md animate-pulse">
-            <Circle className="w-2 h-2 fill-current" />
-            <span className="text-xs font-medium">REC</span>
-          </div>
-        )}
-        
-        {/* Connection indicator */}
-        {participant.isOnline ? (
-          <div className="w-3 h-3 bg-green-500 rounded-full" />
-        ) : (
-          <div className="w-3 h-3 bg-gray-400 rounded-full" />
-        )}
-      </div>
-
-      {/* Screen sharing indicator */}
-      {isScreenSharing && (
-        <div className="absolute top-2 left-2 flex items-center gap-1 bg-blue-600 text-white px-2 py-1 rounded-md">
-          <Monitor className="w-3 h-3" />
-          <span className="text-xs font-medium">Sharing</span>
-        </div>
+      {/* Connection indicator */}
+      {participant.isOnline ? (
+        <div className="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full" />
+      ) : (
+        <div className="absolute top-2 right-2 w-3 h-3 bg-gray-400 rounded-full" />
       )}
     </div>
   );

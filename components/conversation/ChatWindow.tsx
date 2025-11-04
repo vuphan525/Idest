@@ -33,27 +33,27 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
     useEffect(() => {
         const token = localStorage.getItem("access_token");
         if (!token) {
-            console.warn("No access token found for socket connection");
+            console.warn("⚠️ No access token found for socket connection");
             return;
         }
 
         connectSocket(token);
         
         socket.on("connect", () => {
-            console.log("Socket connected:", socket.id);
+            console.log("✅ Socket connected:", socket.id);
             socket.emit("join-conversation", { conversationId });
         });
 
         socket.on("disconnect", () => {
-            console.log("Socket disconnected");
+            console.log("❌ Socket disconnected");
         });
 
         socket.on("join-conversation-success", (data) => {
-            console.log("Joined conversation:", data);
+            console.log("✅ Joined conversation:", data);
         });
 
         socket.on("join-conversation-error", (error) => {
-            console.error("Failed to join conversation:", error);
+            console.error("❌ Failed to join conversation:", error);
         });
 
         // If already connected, join immediately
@@ -62,14 +62,14 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
         }
 
         socket.on("message-new", (msg: MessageDto) => {
-            console.log("Received new message:", msg);
+            console.log("📨 Received new message:", msg);
             setMessages((prev) => {
                 // Check if message already exists
                 if (prev.find((m) => m.id === msg.id)) {
-                    console.log("Message already exists, skipping:", msg.id);
+                    console.log("⚠️ Message already exists, skipping:", msg.id);
                     return prev;
                 }
-                console.log("Adding new message to list:", msg.id);
+                console.log("✅ Adding new message to list:", msg.id);
                 return [...prev, msg];
             });
         });
@@ -109,7 +109,7 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
         });
 
         return () => {
-            console.log("Cleaning up conversation:", conversationId);
+            console.log("🧹 Cleaning up conversation:", conversationId);
             socket.emit("leave-conversation", conversationId);
             socket.off("connect");
             socket.off("disconnect");
@@ -123,7 +123,7 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
         };
     }, [conversationId]);
 
-    // Tự động scroll xuống cuối khi có tin nhắn mới
+    // ✅ Tự động scroll xuống cuối khi có tin nhắn mới
     useEffect(() => {
         endOfMessagesRef.current?.scrollIntoView({ behavior: "auto" });
     }, [messages]);
@@ -136,9 +136,9 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
         setContent(""); // Clear input immediately for better UX
         
         try {
-            console.log("Sending message:", messageContent);
+            console.log("📤 Sending message:", messageContent);
             const result = await conversationService.sendMessage(conversationId, { content: messageContent });
-            console.log("Message sent successfully:", result);
+            console.log("✅ Message sent successfully:", result);
             // Don't add message here - let the socket "message-new" event handle it
             // This ensures consistency across all clients
             
@@ -148,7 +148,7 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
                 clearTimeout(typingTimeoutRef.current);
             }
         } catch (error) {
-            console.error("Send failed:", error);
+            console.error("❌ Send failed:", error);
             // Restore content on error
             setContent(messageContent);
             alert("Failed to send message. Please try again.");
