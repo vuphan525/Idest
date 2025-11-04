@@ -20,17 +20,15 @@ import { toast } from "sonner";
 import { DialogClose } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 
-interface AddClassModalProps {
-  open: boolean;
-  onClose: () => void;
-  onCreated?: () => void;
-}
-
 export default function AddClassModal({
   open,
   onClose,
   onCreated,
-}: AddClassModalProps) {
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void;
+}) {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<CreateClassPayload>({
