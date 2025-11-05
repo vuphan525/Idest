@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import ProtectedLayoutWrapper from "@/components/protected-layout-wrapper";
 import Navbar from "@/components/navbar-content";
 
