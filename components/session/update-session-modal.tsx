@@ -88,9 +88,14 @@ export default function UpdateSessionModal({
       } else {
         setError(res.message || "Failed to update session");
       }
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "An error occurred");
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -112,7 +117,7 @@ export default function UpdateSessionModal({
     const minutes = String(now.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
-  
+
   const minDateTime = getLocalDateTimeString();
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   getUserSessions,
   endSession,
@@ -14,7 +13,6 @@ import LoadingScreen from "@/components/loading-screen";
 import { Calendar } from "lucide-react";
 
 export default function SessionsPage() {
-  const router = useRouter();
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -38,11 +36,11 @@ export default function SessionsPage() {
 
   const loadSessions = async () => {
     try {
-      const res: any = await getUserSessions();
+      const res = await getUserSessions() as UserSessionsResponse;
       console.log("Sessions API response:", res);
-      
+
       let allSessions: SessionData[] = [];
-      
+
       // Handle different response structures
       // API returns: { status, message, data, statusCode }
       // Service returns res.data from axios, so we get the API response object
@@ -63,12 +61,12 @@ export default function SessionsPage() {
         // Response is directly an array (fallback)
         allSessions = res;
       }
-      
+
       // Remove duplicates by session ID
       const uniqueSessions = Array.from(
         new Map(allSessions.map((s) => [s.id, s])).values()
       );
-      
+
       console.log("Processed sessions:", uniqueSessions);
       setSessions(uniqueSessions);
     } catch (err) {
@@ -96,8 +94,12 @@ export default function SessionsPage() {
       } else {
         alert(res.message || "Failed to end session");
       }
-    } catch (err: any) {
-      alert(err.message || "An error occurred");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || "An error occurred");
+      } else {
+        alert("An unknown error occurred");
+      }
     }
   };
 
@@ -111,8 +113,12 @@ export default function SessionsPage() {
       } else {
         alert(res.message || "Failed to delete session");
       }
-    } catch (err: any) {
-      alert(err.message || "An error occurred");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || "An error occurred");
+      } else {
+        alert("An unknown error occurred");
+      }
     }
   };
 

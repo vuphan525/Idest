@@ -19,7 +19,7 @@ export default function MeetingChat({
   messages,
   messageHistory,
   onSendMessage,
-  sessionId,
+  sessionId, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: MeetingChatProps) {
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);

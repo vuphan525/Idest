@@ -40,7 +40,7 @@ export default function MeetingPage() {
         // Validate session exists and user has access
         try {
           const sessionResponse = await getSessionById(sessionId);
-          
+
           if (!sessionResponse || sessionResponse.statusCode !== 200) {
             setError("Session not found or you don't have access to this session.");
             setTimeout(() => router.push("/sessions"), 2000);
@@ -48,7 +48,7 @@ export default function MeetingPage() {
           }
 
           const sessionData = sessionResponse.data;
-          
+
           // Check if session has ended
           if (sessionData.end_time) {
             const endTime = new Date(sessionData.end_time);
@@ -63,7 +63,7 @@ export default function MeetingPage() {
           const startTime = new Date(sessionData.start_time);
           const now = new Date();
           const fiveMinutesEarly = new Date(startTime.getTime() - 5 * 60 * 1000);
-          
+
           if (now < fiveMinutesEarly) {
             const minutesUntilStart = Math.ceil((fiveMinutesEarly.getTime() - now.getTime()) / (1000 * 60));
             setError(`Session hasn't started yet. You can join in ${minutesUntilStart} minutes.`);
@@ -72,21 +72,39 @@ export default function MeetingPage() {
 
           // All validations passed
           setToken(accessToken);
-        } catch (validationError: any) {
+        } catch (validationError: unknown) {
           console.error("Session validation error:", validationError);
-          if (validationError.response?.status === 404) {
-            setError("Session not found.");
-          } else if (validationError.response?.status === 403) {
-            setError("You don't have permission to join this session.");
+
+          if (
+            typeof validationError === "object" &&
+            validationError !== null &&
+            "response" in validationError
+          ) {
+            const resp = (validationError as { response?: { status?: number } }).response;
+
+            if (resp?.status === 404) {
+              setError("Session not found.");
+            } else if (resp?.status === 403) {
+              setError("You don't have permission to join this session.");
+            } else {
+              setError("Failed to validate session access.");
+            }
           } else {
-            setError("Failed to validate session access.");
+            setError("Unexpected error during session validation.");
           }
+
           setTimeout(() => router.push("/sessions"), 2000);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error in session validation:", err);
-        setError(err.message || "Failed to authenticate");
-      } finally {
+
+        if (err instanceof Error) {
+          setError(err.message || "Failed to authenticate");
+        } else {
+          setError("Failed to authenticate due to an unknown error.");
+        }
+      }
+      finally {
         setLoading(false);
       }
     };
