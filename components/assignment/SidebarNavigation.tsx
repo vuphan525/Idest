@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, CheckCircle2, Circle } from "lucide-react";
+import { Clock, CheckCircle2 } from "lucide-react";
 
 // Mock types for preview
 interface SubQuestion {
@@ -88,7 +88,6 @@ export default function SidebarNavigation({
     // Calculate progress
     const totalQuestions = allPassages.reduce((acc, p) => acc + p.subList.length, 0);
     const answeredCount = Object.keys(answers).length;
-    const progressPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
 
     return (
         <div className="w-[280px] bg-white/40 backdrop-blur-xl border-l border-white/20 flex flex-col shadow-2xl">
