@@ -85,10 +85,6 @@ export default function SidebarNavigation({
         });
     });
 
-    // Calculate progress
-    const totalQuestions = allPassages.reduce((acc, p) => acc + p.subList.length, 0);
-    const answeredCount = Object.keys(answers).length;
-
     return (
         <div className="w-[280px] bg-white/40 backdrop-blur-xl border-l border-white/20 flex flex-col shadow-2xl">
 
